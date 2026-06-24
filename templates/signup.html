@@ -60,17 +60,26 @@
 
         <h1>Sign up</h1>
 
-        <form>
+    <form method="POST" action="/login">
 
-            <input type="text" placeholder="Full Name">
+        <input type="email"
+           name="email"
+           placeholder="Email">
 
-            <input type="email" placeholder="Email">
+         <input type="password"
+           name="password"
+           placeholder="Password">
 
-            <input type="tel" placeholder="Phone Number">
+         <button type="submit">
+            Login
+         </button>
 
-            <button type="submit">
-                Sign up
-            </button>
+    </form>
+
+    <p>
+        Don't have an account?
+        <a href="/register">Register</a>
+    </p>
 
         </form>
 

@@ -1,16 +1,19 @@
-from flask import Flask, request, redirect, render_template 
+from flask import Flask, request, redirect, render_template, session
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = "globecare_secret_key"
 
 conn = sqlite3.connect("globecare.db", check_same_thread=False)
 
 conn.execute("""
 CREATE TABLE IF NOT EXISTS users(
 id INTEGER PRIMARY KEY AUTOINCREMENT,
+member_id TEXT,
 name TEXT,
 email TEXT,
-phone TEXT
+phone TEXT,
+password TEXT
 )
 """)
 
@@ -29,14 +32,22 @@ def signup_page():
 @app.route("/login", methods=["POST"])
 def login():
 
-    username = request.form["username"]
+    email = request.form["email"]
     password = request.form["password"]
 
-    if username == "admin" and password == "1234":
+    cursor = conn.execute(
+        "SELECT * FROM users WHERE email=? AND password=?",
+        (email, password)
+    )
 
-        return redirect("/dashboard")
+    user = cursor.fetchone()
 
-    return "<h1>Invalid Login</h1>"
+    if user:
+        session["user_id"] = user[0]
+        session["name"] = user[2]
+        
+        return redirect("/user_dashboard")
+    return "<h1>Invalid Email or Password</h1>"
 
 @app.route("/register", methods=["POST"])
 def register():
@@ -44,27 +55,58 @@ def register():
     name = request.form["name"]
     email = request.form["email"]
     phone = request.form["phone"]
+    password = request.form["password"]
+    confirm_password = request.form["confirm_password"]
 
+    if not name or not email or not phone or not password:
+        return "<h1>All fields are required</h1>"
+
+    if password != confirm_password:
+        return "<h1>Passwords do not match</h1>"
+
+    cursor = conn.execute(
+    "SELECT * FROM users WHERE email=?",
+    (email,)
+)
+
+    existing_user = cursor.fetchone()
+
+    if existing_user:
+        return "<h1>Email already registered</h1>"
+
+    if len(password) < 6:
+        return "<h1>Password must be at least 6 characters</h1>"
+    
+    cursor = conn.execute(
+    "SELECT COUNT(*) FROM users"
+)
+
+    count = cursor.fetchone()[0]
+
+    member_id = f"GC{count + 1:04d}"
+    
     conn.execute(
-        "INSERT INTO users(name,email,phone) VALUES(?,?,?)",
-        (name,email,phone)
-    )
+    "INSERT INTO users(member_id,name,email,phone,password) VALUES(?,?,?,?,?)",
+    (member_id,name,email,phone,password)
+)
 
     conn.commit()
 
     return f"""
-    <h1>Registration Saved</h1>
+    <h1>Registration Successful</h1>
 
     <p>{name}</p>
 
-    <a href='/users'>View All Users</a>
+    <p>Member ID: {member_id}</p>
+
+    <a href='/signup'>Go To Login</a>
     """
 
 @app.route("/users")
 def users():
 
     cursor = conn.execute(
-    "SELECT id,name,email,phone FROM users"
+    "SELECT member_id,name,email,phone FROM users"
 )
 
     users = cursor.fetchall()
@@ -85,7 +127,8 @@ def users():
 
         output += f"""
         <p>
-        Name: {user[1]}<br>
+        Member ID: {user[0]}<br>
+        Name: {user[1]}<br> 
         Email: {user[2]}<br>
         Phone: {user[3]}<br><br>
 
@@ -252,6 +295,36 @@ def update_user(user_id):
 
     return redirect("/users")
 
-    
+@app.route("/user_dashboard")
+def user_dashboard():
+
+    if "user_id" not in session:
+        return redirect("/signup")
+
+    return f"""
+    <h1>Welcome {session['name']}</h1>
+
+    <h3>Client Dashboard</h3>
+
+    <hr>
+
+    <a href='/profile'>My Profile</a>
+
+    <br><br>
+
+    <a href='/security-request'>Request Security Service</a>
+
+    <br><br>
+
+    <a href='/logout'>Logout</a>
+    """
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/")
+        
 if __name__ == "__main__":
     app.run(debug=True)
