@@ -2,7 +2,8 @@ from flask import Flask, request, redirect, render_template, session
 import sqlite3
 
 app = Flask(__name__)
-app.secret_key = "globecare_secret_key"
+
+app.secret_key = "globecare_secret"
 
 conn = sqlite3.connect("globecare.db", check_same_thread=False)
 
@@ -43,9 +44,9 @@ def login():
     user = cursor.fetchone()
 
     if user:
+
         session["user_id"] = user[0]
-        session["name"] = user[2]
-        
+
         return redirect("/user_dashboard")
     return "<h1>Invalid Email or Password</h1>"
 
@@ -298,26 +299,22 @@ def update_user(user_id):
 @app.route("/user_dashboard")
 def user_dashboard():
 
-    if "user_id" not in session:
+    user_id = session.get("user_id")
+
+    if not user_id:
         return redirect("/signup")
 
-    return f"""
-    <h1>Welcome {session['name']}</h1>
+    cursor = conn.execute(
+        "SELECT member_id,name,email,phone FROM users WHERE id=?",
+        (user_id,)
+    )
 
-    <h3>Client Dashboard</h3>
+    user = cursor.fetchone()
 
-    <hr>
-
-    <a href='/profile'>My Profile</a>
-
-    <br><br>
-
-    <a href='/security-request'>Request Security Service</a>
-
-    <br><br>
-
-    <a href='/logout'>Logout</a>
-    """
+    return render_template(
+        "dashboard.html",
+        user=user
+    )
 
 @app.route("/logout")
 def logout():

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Client Dashboard</title>
+
+<link rel="stylesheet" href="/static/dashboard.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <h2>GLOBE-CARE</h2>
+
+    <a href="#">Dashboard</a>
+
+    <a href="#">My Profile</a>
+
+    <a href="#">Request Service</a>
+
+    <a href="#">My Requests</a>
+
+    <a href="#">Announcements</a>
+
+    <a href="/">Logout</a>
+
+</div>
+
+<div class="main">
+
+    <div class="welcome-card">
+
+<h1>Welcome, {{ user[1] }}</h1>
+
+<p>Member ID: {{ user[0] }}</p>
+
+</div>
+
+<div class="profile-card">
+
+    <h3>Profile Summary</h3>
+
+    <p><strong>Member ID:</strong> {{ user[0] }}</p>
+
+    <p><strong>Status:</strong> Active</p>
+
+    <p><strong>Account Type:</strong> Client</p>
+
+</div>
+
+<div class="stats">
+
+<div class="card">
+<h3>Total Requests</h3>
+<h1>0</h1>
+</div>
+
+<div class="card">
+<h3>Pending</h3>
+<h1>0</h1>
+</div>
+
+<div class="card">
+<h3>Approved</h3>
+<h1>0</h1>
+</div>
+
+<div class="card">
+<h3>Emergency</h3>
+<h1>0</h1>
+</div>
+
+</div>
+
+<div class="actions">
+
+    <div class="action-card">
+
+        <h2>🛡 Request Service</h2>
+
+        <p>Request security guards, patrol services or CCTV services.</p>
+
+        <button>Request Now</button>
+
+    </div>
+
+    <div class="action-card">
+
+        <h2>📋 My Requests</h2>
+
+        <p>Track all your submitted requests and their status.</p>
+
+        <button>View Requests</button>
+        </div>
+
+    </div>
+
+<div class="announcement-card">
+
+    <h3>📢 Announcements</h3>
+
+    <ul>
+        <li>Welcome to Globe-Care Services Ltd.</li>
+        <li>Security request system coming soon.</li>
+        <li>New client dashboard launched.</li>
+    </ul>
+
+</div>    
+
+</div>
+
+
+</div>
+
+</div>
+
+</body>
+
+</html>
