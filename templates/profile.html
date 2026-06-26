@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>My Profile</title>
+</head>
+
+<body>
+
+{% if user[4] %}
+
+<img
+src="/uploads/{{ user[4] }}"
+width="120"
+height="120"
+style="border-radius:50%; object-fit:cover;">
+
+{% else %}
+
+<div style="
+width:120px;
+height:120px;
+background:#ddd;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:40px;
+">
+
+👤
+
+</div>
+
+{% endif %}
+
+<h1>My Profile</h1>
+
+<p><strong>Member ID:</strong> {{ user[0] }}</p>
+
+<p><strong>Name:</strong> {{ user[1] }}</p>
+
+<p><strong>Email:</strong> {{ user[2] }}</p>
+
+<p><strong>Phone:</strong> {{ user[3] }}</p>
+
+<hr>
+
+<form method="POST" action="/upload_photo"
+      enctype="multipart/form-data">
+
+    <input type="file" name="photo">
+
+    <button type="submit">
+        Upload Photo
+    </button>
+
+</form>
+
+<br>
+
+<a href="/user_dashboard">
+Back To Dashboard
+</a>
+
+</body>
+
+</html>

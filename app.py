@@ -1,7 +1,15 @@
-from flask import Flask, request, redirect, render_template, session
+from flask import Flask, request, redirect, render_template, session, send_from_directory
 import sqlite3
+from werkzeug.utils import secure_filename
+
+import sqlite3
+import os
 
 app = Flask(__name__)
+
+UPLOAD_FOLDER = "uploads"
+
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 app.secret_key = "globecare_secret"
 
@@ -17,6 +25,13 @@ phone TEXT,
 password TEXT
 )
 """)
+
+try:
+    conn.execute(
+        "ALTER TABLE users ADD COLUMN photo TEXT"
+    )
+except:
+    pass
 
 @app.route("/")
 def home():
@@ -316,6 +331,62 @@ def user_dashboard():
         user=user
     )
 
+@app.route("/profile")
+def profile():
+
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect("/signup")
+
+    cursor = conn.execute(
+        "SELECT member_id,name,email,phone,photo FROM users WHERE id=?",
+        (user_id,)
+    )
+
+    user = cursor.fetchone()
+
+    return render_template(
+        "profile.html",
+        user=user
+    )
+
+@app.route("/upload_photo", methods=["POST"])
+def upload_photo():
+
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return redirect("/signup")
+
+    photo = request.files["photo"]
+
+    if photo.filename == "":
+        return "<h1>No file selected.</h1>"
+
+    filename = secure_filename(photo.filename)
+
+    photo.save(
+        os.path.join(app.config["UPLOAD_FOLDER"], filename)
+    )
+
+    conn.execute(
+        "UPDATE users SET photo=? WHERE id=?",
+        (filename, user_id)
+    )
+
+    conn.commit()
+
+    return redirect("/profile")
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+
+    return send_from_directory(
+        app.config["UPLOAD_FOLDER"],
+        filename
+    )
+     
 @app.route("/logout")
 def logout():
 

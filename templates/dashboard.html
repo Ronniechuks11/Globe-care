@@ -15,9 +15,29 @@
 
     <h2>GLOBE-CARE</h2>
 
+    <div class="sidebar-profile">
+
+        {% if user[4] %}
+
+    <img src="/uploads/{{ user[4] }}" class="profile-pic">
+
+    {% else %}
+
+    <div class="profile-pic-placeholder">
+    👤
+    </div>
+
+    {% endif %}
+
+        <h3>WELCOME,<br>{{ user[1] }}</h3>
+
+        <p>Member ID: {{ user[0] }}</p>
+
+    </div>
+
     <a href="#">Dashboard</a>
 
-    <a href="#">My Profile</a>
+    <a href="/profile">My Profile</a>
 
     <a href="#">Request Service</a>
 
@@ -31,11 +51,11 @@
 
 <div class="main">
 
-    <div class="welcome-card">
+<div class="welcome-card">
 
-<h1>Welcome, {{ user[1] }}</h1>
+    <h1>Welcome, {{ user[1] }}</h1>
 
-<p>Member ID: {{ user[0] }}</p>
+    <p>Member ID: {{ user[0] }}</p>
 
 </div>
 
@@ -96,13 +116,10 @@
         <button>View Requests</button>
         </div>
 
-    </div>
+    <div class="announcement-card">
 
-<div class="announcement-card">
+        <h2>📢 Announcements</h2>
 
-    <h3>📢 Announcements</h3>
-
-    <ul>
         <li>Welcome to Globe-Care Services Ltd.</li>
         <li>Security request system coming soon.</li>
         <li>New client dashboard launched.</li>
